@@ -13,6 +13,7 @@ data=pd.read_csv("Dataset.csv") # to read the csv file in to variable in python
 
 data.info() # this will give the overall information about the dataset features 
             #(attribute name, size, data type and memory size )
+print(data.head())
             
 # by inspecting the data information, we can understand that the "Species" is the 
 # Target of this dataset i.e flower type. There are four features(Septal Length, Septal Width, 
@@ -27,7 +28,9 @@ data.info() # this will give the overall information about the dataset features
 #target(species) column, first we have to know how to access the particular column of data alone.
     
 targ=data["Species"] # access the data frame column through its name
+
 targ1=data.iloc[:,4] # accessing the data frame column through its position
+
 
 #need to check whether any data in target is missing
 print(targ.isnull().sum()) # printing total number of null values in the target column
@@ -38,7 +41,7 @@ print(data.isnull().sum()) # printing total number of null values in each column
 
 print(targ.value_counts()) # to count the target catagories. 
 
-sb.countplot(targ) # to visualize the target counts as a plot. In the database given all three catagories
+#sb.countplot(targ) # to visualize the target counts as a plot. In the database given all three catagories
                    # evenly distributed as 50
 
 # DATA NORMALIZATION
@@ -76,14 +79,14 @@ sb.boxplot(x='features', y='value',hue = 'Species',data=plt_data1)
 
 # joint plot is an another cool feature of seaborn, which will give the probablilty distribution graph 
 #and pearson correlation coefficient vale between features.
-sb.jointplot(norm_feat.loc[:,'Sepal.Length'], 
-             norm_feat.loc[:,'Sepal.Width'], kind="regg", color="#ce1414")
+#sb.jointplot(norm_feat.loc[:,'Sepal.Length'], 
+#             norm_feat.loc[:,'Sepal.Width'], kind="regg", color="#ce1414")
  # p value in the above graph is -0.12 (- sign indicates negative correlation). The Low p value
 #indicates that correlation between Sepal Length and Sepal width is less, which means both are differnt 
 #kind of features            
 
-sb.jointplot(norm_feat.loc[:,'Sepal.Length'], 
-             norm_feat.loc[:,'Petal.Length'], kind="regg", color="#ce1414")
+#sb.jointplot(norm_feat.loc[:,'Sepal.Length'], 
+ #            norm_feat.loc[:,'Petal.Length'], kind="regg", color="#ce1414")
 
  # p value in the above graph is 0.9. The Low p value indicates that correlation between Sepal Length 
  #and Sepal width is more, which means both are similar kind of features 
@@ -145,10 +148,13 @@ sb.heatmap(norm_feat.corr(),annot=True,linewidths=.5,fmt= '.1f')
 plt.yticks(rotation=0)
 
 sel_feat=norm_feat.drop(["Sepal.Length","Petal.Length"],axis=1)
-
+X=sel_feat.values
+Y=targ_value
+print(Y)
 #train and test data split for reduced feature dataset
-XtrainR, XtestR , YtrainR, YtestR = train_test_split(sel_feat,targ_value,test_size=0.2, random_state=42)
-
+XtrainR, XtestR , YtrainR, YtestR = train_test_split(X,Y,test_size=0.2, random_state=42)
+print("xtest")
+print(XtestR)
 #logical regression model for reduced feature dataset
 lregR=LogisticRegression()
 lregR.fit(XtrainR,YtrainR)
@@ -210,7 +216,12 @@ print(classification_report(YtestR, clf_pred)) # which will give Precision, Reca
 #Pickle packege is used to save the trained model for future use/prediction
 import pickle
 pickle.dump(clf_hyp,open("iris_clf_model.pkl","wb"))
-
+pickle_in=open('iris_clf_model.pkl','rb')
+model=pickle.load(pickle_in)
+print("test result")
+encoded_predicted_label=model.predict([[3.0,1.0]])[0]
+original_label_name=LE.inverse_transform([encoded_predicted_label])[0]
+print(original_label_name)
 # Summary of Work done
 
 #1. Data normalized and checked for any null values
